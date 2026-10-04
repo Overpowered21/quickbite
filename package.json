@@ -1,0 +1,14 @@
+{
+  "name": "quickbite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal QuickBite food delivery application for Agile Assignment 1",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}

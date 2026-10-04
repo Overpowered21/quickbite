@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QuickBite – Food Delivery System</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="page-header">
+      <div class="container">
+        <p class="eyebrow">Food Delivery</p>
+        <h1>QuickBite – Food Delivery System</h1>
+        <p>Find a restaurant and explore its menu.</p>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section class="panel account-panel" aria-labelledby="account-heading">
+        <h2 id="account-heading">Your account</h2>
+        <p id="auth-message" role="status" aria-live="polite"></p>
+
+        <div id="auth-forms">
+          <div class="auth-switch" role="group" aria-label="Account action">
+            <button id="show-login" type="button" aria-pressed="true">Log in</button>
+            <button id="show-register" type="button" aria-pressed="false">Register</button>
+          </div>
+
+          <form id="login-form" novalidate>
+            <h3>Log in</h3>
+            <label for="login-email">Email</label>
+            <input id="login-email" name="email" type="email" autocomplete="username" required aria-describedby="login-email-error">
+            <p class="field-error" id="login-email-error"></p>
+            <label for="login-password">Password</label>
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-password-error">
+            <p class="field-error" id="login-password-error"></p>
+            <button class="primary" type="submit">Log in</button>
+          </form>
+
+          <form id="register-form" novalidate hidden>
+            <h3>Create an account</h3>
+            <label for="register-name">Name</label>
+            <input id="register-name" name="name" autocomplete="name" required aria-describedby="register-name-error">
+            <p class="field-error" id="register-name-error"></p>
+            <label for="register-email">Email</label>
+            <input id="register-email" name="email" type="email" autocomplete="username" required aria-describedby="register-email-error">
+            <p class="field-error" id="register-email-error"></p>
+            <label for="register-password">Password (at least 8 characters)</label>
+            <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="register-password-error">
+            <p class="field-error" id="register-password-error"></p>
+            <button class="primary" type="submit">Register</button>
+          </form>
+        </div>
+
+        <div id="account-details" hidden>
+          <p>Logged in as <strong id="customer-name"></strong></p>
+          <p id="customer-email"></p>
+          <button id="logout" type="button">Log out</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="restaurants-heading">
+        <h2 id="restaurants-heading">Available restaurants</h2>
+        <form id="search-form" role="search">
+          <label for="search">Search by restaurant name or cuisine</label>
+          <div class="search-controls">
+            <input id="search" name="q" type="search" placeholder="Try Italian or Biryani" autocomplete="off">
+            <button class="primary" type="submit">Search</button>
+            <button id="clear-search" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="restaurant-message" role="status" aria-live="polite">Loading restaurants…</p>
+        <ul id="restaurant-list" class="restaurant-list"></ul>
+
+        <section id="menu-panel" class="menu-panel" aria-labelledby="menu-heading" hidden>
+          <h3 id="menu-heading" tabindex="-1"></h3>
+          <p id="menu-cuisine" class="muted"></p>
+          <ul id="menu-list" class="menu-list"></ul>
+        </section>
+      </section>
+    </main>
+    <noscript>Enable JavaScript to use QuickBite registration, login, and restaurant browsing.</noscript>
+  </body>
+</html>

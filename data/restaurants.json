@@ -1,0 +1,32 @@
+[
+  {
+    "id": "biryani-house",
+    "name": "Biryani House",
+    "cuisine": "Indian",
+    "menu": [
+      { "name": "Vegetable Biryani", "price": 180 },
+      { "name": "Chicken Biryani", "price": 240 },
+      { "name": "Paneer Tikka", "price": 200 }
+    ]
+  },
+  {
+    "id": "bella-italia",
+    "name": "Bella Italia",
+    "cuisine": "Italian",
+    "menu": [
+      { "name": "Margherita Pizza", "price": 280 },
+      { "name": "Tomato Basil Pasta", "price": 230 },
+      { "name": "Garlic Bread", "price": 120 }
+    ]
+  },
+  {
+    "id": "green-bowl",
+    "name": "Green Bowl",
+    "cuisine": "Asian",
+    "menu": [
+      { "name": "Vegetable Noodles", "price": 170 },
+      { "name": "Tofu Rice Bowl", "price": 210 },
+      { "name": "Spring Rolls", "price": 130 }
+    ]
+  }
+]
