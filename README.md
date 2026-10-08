@@ -76,3 +76,5 @@ public/styles.css      Responsive page styles
 public/app.js          Account, restaurant, menu, and search interactions
 test/app.test.js       HTTP integration tests
 ```
+
+# Search feature branch work
