@@ -184,12 +184,13 @@ export function createApp({ restaurants = sampleRestaurants } = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.PORT || 3000);
+  const host = process.env.HOST || '127.0.0.1';
   const app = createApp();
   app.on('error', (error) => {
     console.error(`QuickBite could not start: ${error.message}`);
     process.exitCode = 1;
   });
-  app.listen(port, '127.0.0.1', () => {
-    console.log(`QuickBite – Food Delivery System: http://127.0.0.1:${app.address().port}`);
+  app.listen(port, host, () => {
+    console.log(`QuickBite – Food Delivery System: http://${host}:${app.address().port}`);
   });
 }

@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-  build:
+  ci-cd:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,32 +20,30 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Run tests
         run: npm test
 
-      - name: Package QuickBite
-        run: zip -r quickbite.zip . -x ".git/*" "node_modules/*" "quickbite.zip"
-
-      - name: Upload QuickBite package
-        uses: actions/upload-artifact@v4
-        with:
-          name: quickbite-package
-          path: quickbite.zip
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download QuickBite package
-        uses: actions/download-artifact@v4
-        with:
-          name: quickbite-package
-
-      - name: Deploy package (demonstration)
+      - name: Build and deploy with Docker Compose
         run: |
-          unzip -q quickbite.zip -d deployed
-          echo "QuickBite package deployed for demonstration."
+          docker compose up --build -d
+
+      - name: Verify Compose deployment
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              echo "QuickBite is serving traffic."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "QuickBite did not become ready."
+          docker compose logs
+          exit 1
+
+      - name: Show deployment status
+        if: always()
+        run: docker compose ps
+
+      - name: Stop Compose deployment
+        if: always()
+        run: docker compose down
