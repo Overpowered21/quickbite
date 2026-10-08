@@ -1,0 +1,49 @@
+name: QuickBite CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Package QuickBite
+        run: zip -r quickbite.zip . -x ".git/*" "node_modules/*" "quickbite.zip"
+
+      - name: Upload QuickBite package
+        uses: actions/upload-artifact@v4
+        with:
+          name: quickbite-package
+          path: quickbite.zip
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download QuickBite package
+        uses: actions/download-artifact@v4
+        with:
+          name: quickbite-package
+
+      - name: Deploy package (demonstration)
+        run: |
+          unzip -q quickbite.zip -d deployed
+          echo "QuickBite package deployed for demonstration."
