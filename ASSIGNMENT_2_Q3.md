@@ -1,100 +1,135 @@
-# Assignment 2 — Question 3: End-to-End DevOps Pipeline
+﻿# Assignment 2 — Question 3: End-to-End DevOps Pipeline
 
-**Application:** QuickBite food-delivery web application with the Assignment 2 Q2 Iris
-model lifecycle and monitoring stack.
+**Application:** QuickBite food-delivery web application with the Assignment 2 Q2 Iris model lifecycle and monitoring stack.
 
-**Objective:** Show how the existing Agile planning, Git/GitHub, GitHub Actions,
-Docker Compose, MLflow, Prometheus, and Grafana work fit together without adding a new
-platform or application feature.
+**Objective:** Demonstrate how Agile planning, Git/GitHub, GitHub Actions, Docker Compose, MLflow, Prometheus, and Grafana work together in the project.
 
-## 1. Architecture and workflow
+## 1. Workflow and Implementation
 
-The complete workflow is shown in
-[`ASSIGNMENT_2_Q3_ARCHITECTURE.md`](ASSIGNMENT_2_Q3_ARCHITECTURE.md).
+### 1.1 Agile Planning
 
-The flow is:
+The project uses Agile planning to organize requirements and development tasks. The prioritized user stories and acceptance criteria are documented in `AGILE_ASSIGNMENT_Q1.md`. The Jira-ready product backlog is maintained in `JIRA_BACKLOG.md`, including registration/login, restaurant browsing, and restaurant search.
 
-1. **Plan:** Q1 defines the prioritized QuickBite stories and acceptance criteria in
-   [`AGILE_ASSIGNMENT_Q1.md`](AGILE_ASSIGNMENT_Q1.md). The Jira-ready product backlog is
-   [`JIRA_BACKLOG.md`](JIRA_BACKLOG.md), covering US-01 registration/login, US-02
-   restaurant browsing, and US-11 restaurant search.
-2. **Version control:** Work is maintained in the Git repository
-   [`Overpowered21/quickbite`](https://github.com/Overpowered21/quickbite), on `main`.
-   The existing history shows the application, GitHub Actions, Docker Compose, and Q2
-   lifecycle/monitoring being added as separate traceable changes.
-3. **CI/CD:**
-   [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) runs on pushes to
-   `main`, pull requests, and manual dispatch. It checks out the revision, installs
-   Node.js 20, runs `npm test`, builds and starts the root Compose deployment, checks
-   `http://127.0.0.1:3000/`, displays Compose status, and tears the deployment down.
-4. **Application deployment:** The root
-   [`docker-compose.yml`](docker-compose.yml) builds the Node.js image from
-   [`Dockerfile`](Dockerfile), publishes QuickBite on port 3000, and uses the image
-   health check. This is the application deployment verified by the current Actions
-   workflow.
-5. **MLflow model lifecycle:** The existing Q2 stack is started from the same checked-
-   out repository with
-   `docker compose -f q2/compose.yaml up --build -d`. Its dependency order is MLflow
-   healthy → one-shot `train` successful → model API healthy → Prometheus → Grafana.
-   [`q2/train.py`](q2/train.py) trains the standardized Iris logistic-regression model,
-   records the `q2-iris-classification` experiment's parameters, metrics, artifacts,
-   signature, and input example, registers `iris-classifier`, and assigns the
-   `champion` alias. [`q2/service.py`](q2/service.py) resolves that alias at startup,
-   loads the exact registered version, and exposes `/health` and `/predict`.
-6. **Monitoring:** The model API exposes `/metrics`. The existing
-   [`q2/monitoring/prometheus.yml`](q2/monitoring/prometheus.yml) scrapes
-   `model-service:8000` every five seconds. Grafana is provisioned with the Prometheus
-    datasource ([`q2/monitoring/datasource.yml`](q2/monitoring/datasource.yml) and
-    [`q2/monitoring/dashboards.yml`](q2/monitoring/dashboards.yml)) and
-    [`q2/monitoring/dashboard.json`](q2/monitoring/dashboard.json), which displays
-    scrape availability, loaded model version, prediction throughput, error ratio, and
-    p95 latency. Monitoring results feed defects or improvements back into the backlog
-    for the next iteration.
+### 1.2 Version Control
 
-The existing Q2 monitoring stack observes the Q2 model API. The current GitHub Actions
-file automates the root QuickBite deployment; Q2's Compose lifecycle is the documented
-repository-level demonstration path and is not falsely represented as an additional
-Actions job.
+The project source code is maintained in Git and hosted on GitHub:
 
-## 2. Execution evidence
+https://github.com/Overpowered21/quickbite
 
-| Pipeline area | Evidence and observed result |
+The `main` branch contains the application, CI/CD workflow, Docker deployment configuration, and Q2 model lifecycle and monitoring implementation. Git commits provide traceability for project changes.
+
+### 1.3 Continuous Integration and Delivery
+
+The GitHub Actions workflow is defined in `.github/workflows/ci-cd.yml`. It runs on pushes to `main`, pull requests, and manual workflow dispatch.
+
+The workflow performs the following operations:
+
+1. Checks out the repository.
+2. Sets up Node.js 20.
+3. Installs the application dependencies.
+4. Runs the automated test suite using `npm test`.
+5. Builds and starts the Docker Compose application.
+6. Checks the application HTTP response at `http://127.0.0.1:3000/`.
+7. Displays the Compose deployment status.
+8. Stops the temporary deployment during cleanup.
+
+### 1.4 Docker-Based Application Deployment
+
+The root `Dockerfile` defines the QuickBite application image. The root `docker-compose.yml` builds and runs the application and publishes it on port 3000.
+
+The GitHub Actions workflow verifies the application using a temporary Docker Compose deployment. This demonstrates automated testing, container image building, application startup, HTTP verification, and cleanup.
+
+### 1.5 MLflow Model Lifecycle
+
+The Q2 implementation uses the Iris dataset and a standardized logistic-regression model.
+
+The `q2/train.py` script trains the model and records parameters, metrics, artifacts, the model signature, and an input example in the MLflow experiment `q2-iris-classification`. The trained model is registered as `iris-classifier`, with the `champion` alias identifying the selected model version.
+
+The `q2/service.py` application loads the registered model and exposes API endpoints, including `/health` and `/predict`.
+
+The Q2 stack is started using:
+
+`docker compose -f q2/compose.yaml up --build -d`
+
+### 1.6 Monitoring with Prometheus and Grafana
+
+The Q2 model API exposes a `/metrics` endpoint. Prometheus scrapes the `model-service:8000` target every five seconds using the configuration in `q2/monitoring/prometheus.yml`.
+
+Grafana is provisioned with a Prometheus data source and a dashboard defined in `q2/monitoring/dashboard.json`. The dashboard displays monitoring information such as scrape availability, loaded model version, prediction traffic, error ratio, and p95 latency.
+
+Prediction requests can be generated to populate the dashboard and demonstrate how application activity is reflected in monitoring metrics.
+
+**Workflow scope:** The current GitHub Actions workflow automates the root QuickBite application deployment. The Q2 MLflow, model API, Prometheus, and Grafana services are demonstrated separately through the Q2 Docker Compose configuration. The Q2 stack is not represented as an additional GitHub Actions job.
+
+## 2. Execution Evidence
+
+| Pipeline area | Evidence and result |
 |---|---|
-| Local CI | `npm test` was executed in this checkout: **26 tests passed, 0 failed**. |
-| Git/GitHub traceability | The local `main` history contains `84288f7` (GitHub Actions), `9c15628` (Docker Compose deployment), and `5328045` (Q2 MLflow and monitoring). The repository remote is `https://github.com/Overpowered21/quickbite`. |
-| GitHub Actions CI/CD | [Run #2](https://github.com/Overpowered21/quickbite/actions/runs/37823879253) for commit `9c1562832ce783718f242a18c5b1818c19f73eda` completed with **success**. Its job steps succeeded for Node setup, tests, Docker Compose build/deploy, HTTP verification, Compose status, and cleanup. |
-| QuickBite deployment | The successful Actions run provides execution evidence for `docker compose up --build -d`, the HTTP readiness check on port 3000, `docker compose ps`, and `docker compose down`. |
-| Q2 model lifecycle | The repeatable commands and expected observations are recorded in [`q2/README.md`](q2/README.md): `train` exits with code 0, MLflow contains experiment/model versions, `/health` identifies the loaded version, and changing `--c` creates a new version and moves `champion`. The implementation is in `q2/train.py`, `q2/service.py`, and `q2/compose.yaml`. |
-| Q2 monitoring | [`q2/README.md`](q2/README.md) provides the checks for `/metrics`, Prometheus **Status → Targets** (`model-service` UP), Grafana's Q2 dashboard, generated prediction traffic, invalid-input errors, and an availability stop/start demonstration. |
+| Automated tests | The local test run reported 26 tests passed and 0 failed. |
+| Git and GitHub | Git history records the CI/CD workflow, Docker Compose deployment, Q2 MLflow and monitoring implementation, and Q3 documentation. |
+| GitHub Actions | The recorded workflow run completed successfully: [GitHub Actions Run #2](https://github.com/Overpowered21/quickbite/actions/runs/37823879253). |
+| QuickBite deployment | The successful workflow run verifies the Docker Compose build and startup, HTTP check on port 3000, deployment status, and cleanup. |
+| MLflow lifecycle | The Q2 stack ran locally. The MLflow interface showed experiment runs and the registered `iris-classifier` model version. The training container completed successfully. |
+| Prometheus monitoring | The Prometheus Targets page showed the `model-service` target as UP. |
+| Grafana monitoring | After prediction requests were generated, the Grafana dashboard displayed monitoring graphs. Screenshots were captured for the MLflow experiment, model registry, Prometheus target status, and Grafana dashboard. |
 
-The sandbox used for this documentation has Node.js but does not have the Docker CLI,
-so the Q2 Compose runtime was not re-run locally during this documentation pass. The
-Q2 commands, service ordering, endpoints, Prometheus queries, and dashboard panels
-above are taken directly from the existing Q2 implementation and README; the Docker
-deployment evidence shown as executed is the public GitHub Actions run listed above.
+The GitHub Actions execution verifies the automated QuickBite CI/CD workflow. The local Q2 execution and screenshots provide separate evidence for model lifecycle and monitoring.
 
-## 3. Demonstration commands
+## 3. Demonstration Commands
 
-From the project root, the existing work can be demonstrated in this order:
+Run the following commands from the project root.
+
+### QuickBite application
 
 ```bash
-# QuickBite CI and local application
 npm test
 docker compose up --build -d
-curl --fail http://127.0.0.1:3000/
 docker compose ps
+```
 
-# Q2 MLflow, model API, Prometheus, and Grafana
+Verify the application at:
+
+`http://localhost:3000`
+
+Stop the root application when finished:
+
+```bash
+docker compose down
+```
+
+### Q2 model lifecycle and monitoring
+
+Start the Q2 services:
+
+```bash
 docker compose -f q2/compose.yaml up --build -d
 docker compose -f q2/compose.yaml ps -a
 docker compose -f q2/compose.yaml logs train model-service
-curl -fsS http://localhost:8000/health
-curl -fsS http://localhost:8000/predict \
-  -H 'Content-Type: application/json' \
-  -d '{"features":[5.1,3.5,1.4,0.2]}'
 ```
 
-The existing Q2 URLs are MLflow `http://localhost:5000`, model API
-`http://localhost:8000`, Prometheus `http://localhost:9090`, and Grafana
-`http://localhost:3001`. The Q2 README contains the traffic-generation, invalid-input,
-model-version update, rollback, and shutdown commands used to complete the demonstration.
+Check model API health:
+
+```bash
+curl -fsS http://localhost:8000/health
+```
+
+Submit a sample prediction:
+
+```bash
+curl -fsS http://localhost:8000/predict -H "Content-Type: application/json" -d "{\"features\":[5.1,3.5,1.4,0.2]}"
+```
+
+### Q2 service URLs
+
+- MLflow: `http://localhost:5000`
+- Model API documentation: `http://localhost:8000/docs`
+- Prometheus: `http://localhost:9091`
+- Grafana: `http://localhost:3001`
+
+Prometheus uses host port 9091 in the current local setup because port 9090 was already occupied by another project.
+
+## 4. Conclusion
+
+The QuickBite project demonstrates an end-to-end DevOps workflow connecting Agile planning, Git-based version control, automated testing, GitHub Actions, Docker Compose deployment, MLflow model lifecycle management, and Prometheus/Grafana monitoring.
+
+The successful GitHub Actions run provides evidence of the automated QuickBite CI/CD pipeline, while the local Q2 execution and captured screenshots demonstrate the model lifecycle and monitoring stack. Together, these components show how application changes can be tested and deployed, while service performance and model activity can be monitored for future improvements.
